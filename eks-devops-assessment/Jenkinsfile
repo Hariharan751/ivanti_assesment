@@ -1,0 +1,55 @@
+pipeline {
+  agent any
+
+  environment {
+    AWS_REGION = "ap-south-1"
+    EKS_CLUSTER_NAME = "eks-dev-cluster"
+    IMAGE_NAME = "sample-app"
+    IMAGE_TAG = "${BUILD_NUMBER}"
+  }
+
+  stages {
+
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sh '''
+          docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+        '''
+      }
+    }
+
+    stage('Push Docker Image') {
+      steps {
+        sh '''
+          echo "In real setup, this stage pushes image to ECR"
+          echo "Skipping actual push for assessment"
+        '''
+      }
+    }
+
+    stage('Deploy to EKS') {
+      steps {
+        sh '''
+          echo "Configuring kubeconfig for EKS"
+          echo "aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}"
+
+          echo "Deploying Kubernetes manifests"
+          echo "kubectl apply -f k8s/"
+        '''
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "Pipeline completed"
+    }
+  }
+}
+

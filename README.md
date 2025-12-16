@@ -1,1 +1,0 @@
-# ivanti_assesment
